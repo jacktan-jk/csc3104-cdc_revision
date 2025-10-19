@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDC – Lecture 02 MCQ Test (System Models)</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>CDC – Lecture 02 MCQ Test</h1>
+        <div class="sub">System & Architectural Models • Client–Server • P2P • Proxies/Applets/Thin Clients • Interaction (latency/bw/jitter, clocks) • Sync vs Async • Event Ordering • Failure Model • Reliability • Security & Threats • 30 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Source: Lecture_02 – System Models (Coulouris et al.). For study practice only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // Abstraction & architecture
+    {t:"The lecture frames distributed systems as being ‘about’…",
+     o:["mastering every hardware detail","abstraction: extracting simplicity from complexity","avoiding networks entirely","only vertical integration"],
+     a:1,
+     e:"Slides stress abstraction (layering, interfaces) to manage complexity."},
+
+    {t:"An architectural model primarily concerns…",
+     o:["pixel density of displays","component placement and interrelationships (roles & communication patterns)","only programming languages","color themes"],
+     a:1,
+     e:"Architecture = where components run and how they interact."},
+
+    {t:"Platform layer provides…",
+     o:["only user-facing GUIs","services from OS/middleware/hardware to raise the programming interface","domain models only","DNS name resolution only"],
+     a:1,
+     e:"Platform spans hardware+OS+middleware services for higher layers."},
+
+    // Client–Server
+    {t:"In the client–server model, clients…",
+     o:["run on the same host as servers by definition","invoke server processes on separate hosts to access shared resources","never call other servers","must be thick terminals"],
+     a:1,
+     e:"Clients invoke servers across the network to access managed resources."},
+
+    {t:"Which is true in CS systems?",
+     o:["Servers cannot be clients","Servers may themselves be clients of other servers (e.g., DNS, file server)","DNS is a client of web servers","Clients assign IP addresses"],
+     a:1,
+     e:"Web servers often depend on DNS and file servers."},
+
+    // P2P
+    {t:"Peer‑to‑peer model is characterized by…",
+     o:["strict client/server roles","similar roles among processes that cooperate as peers","single central coordinator","no scalability benefits"],
+     a:1,
+     e:"Processes act as peers; capacity/bandwidth scale with participants."},
+
+    {t:"One cited benefit of P2P is…",
+     o:["reduced capacity vs. centralized","capacity/bandwidth effectively grow with more peers","no need for routing","guaranteed fairness"],
+     a:1,
+     e:"Resources scale horizontally as peers join."},
+
+    // Variations (proxies, replication, mobile code, thin clients)
+    {t:"Using multiple servers and caches primarily targets…",
+     o:["code readability","performance, availability, and resilience via partition/replication","removing network access","UI animation"],
+     a:1,
+     e:"Partition/replication/caching spread load and improve resilience."},
+
+    {t:"A web proxy server…",
+     o:["adds latency by design only","can cache and forward requests to reduce latency and load","replaces DNS","is a thin client"],
+     a:1,
+     e:"Proxies serve cached content and forward misses to origin."},
+
+    {t:"Mobile code/applet pattern in slides shows…",
+     o:["server pushing code to run at client for interaction","clients never execute remote code","only server‑side rendering","OS virtualization"],
+     a:0,
+     e:"Applet/JS/AJAX downloaded to client to improve interactivity."},
+
+    {t:"Thin clients are described as…",
+     o:["high‑spec gaming rigs","low‑cost endpoints with minimal local software relying on compute servers","peer routers","DNS resolvers"],
+     a:1,
+     e:"They download OS/apps or use remote desktop to central servers."},
+
+    // Design requirements
+    {t:"Which is a performance concern noted for distributed architectures?",
+     o:["context switches and data transfers are free","responsiveness can suffer; keep layers minimal & payloads small","throughput is unrelated to middleware depth","load balancing is irrelevant"],
+     a:1,
+     e:"Responsiveness & throughput are impacted by layers, payload size, and load."},
+
+    {t:"Quality of service (QoS) in this context covers…",
+     o:["only UI animations","reliability, security, performance (non‑functional properties)","copyright law","only CPU frequency"],
+     a:1,
+     e:"QoS spans non‑functional attributes experienced by users."},
+
+    // Fundamental interaction model
+    {t:"Latency comprises propagation, transmission time, and…",
+     o:["DNS lookup only","queuing delays in routers/OS end‑systems","CPU cache misses","user think time"],
+     a:1,
+     e:"Slides split latency into propagation, transmission, and queuing."},
+
+    {t:"Bandwidth is defined as…",
+     o:["time per packet","total information transferable per unit time (shared)","TTL value","window size"],
+     a:1,
+     e:"Also note sharing among competing channels."},
+
+    {t:"Jitter is…",
+     o:["average latency","variation in message delivery times","packet loss probability","time to first byte"],
+     a:1,
+     e:"Variance of delivery times across messages."},
+
+    {t:"Regarding clocks in distributed systems, the slides state…",
+     o:["all clocks are perfectly synchronized","each computer has its own clock with offset/drift; hard to synchronize","NTP eliminates drift perfectly","clocks are unnecessary"],
+     a:1,
+     e:"Offsets and drift complicate coordination; solutions have limits (e.g., GPS visibility)."},
+
+    // Sync vs Async
+    {t:"A synchronous DS assumes known bounds on…",
+     o:["process step time, message delay, and clock drift","only disk I/O","DNS TTLs","user think time"],
+     a:0,
+     e:"Strong timing assumptions; often unrealistic to guarantee."},
+
+    {t:"An asynchronous DS assumes…",
+     o:["no bounds on execution speeds, message delays, or clock drift","bounded delay but unknown drift","lockstep progress","guaranteed fair queues"],
+     a:0,
+     e:"Internet‑like conditions: unbounded delays; solutions valid here are robust."},
+
+    // Event ordering
+    {t:"Event ordering interest arises because…",
+     o:["we have a perfect global clock","we often need to know ‘before/after/concurrent’ across processes without accurate clocks","email is strictly FIFO","TCP always preserves application causality"],
+     a:1,
+     e:"Ordering can be reasoned about despite imperfect clocks (mailing‑list example)."},
+
+    // Failure model
+    {t:"Failure model classifies…",
+     o:["UI glitches","fault types in processes and channels (omission, arbitrary/Byzantine, timing)","only hardware errors","user mistakes only"],
+     a:1,
+     e:"Three categories per component as per slides."},
+
+    {t:"A process omission failure means…",
+     o:["process runs twice","process crashes or fails to perform required actions","packet duplicated","clock jumps forward"],
+     a:1,
+     e:"Crashed process fails to respond; often detected via timeouts (fail‑stop)."},
+
+    {t:"Channel omission failure examples include…",
+     o:["message dropped or not delivered to receiver buffer","message reordered but never delivered","wrong arithmetic result","UI freeze only"],
+     a:0,
+     e:"Send/receive/buffer omissions in the communication path."},
+
+    {t:"Arbitrary (Byzantine) failures can include…",
+     o:["only crashes","wrong values returned or fabricated/duplicated/corrupted messages","only timeouts","only checksum errors"],
+     a:1,
+     e:"Worst‑case: any behavior including bogus or duplicate deliveries."},
+
+    {t:"Timing failures refer to…",
+     o:["aesthetic delays","process not meeting execution deadlines","user impatience","DNS cache expiry"],
+     a:1,
+     e:"Missing required timing constraints is a timing failure."},
+
+    {t:"Masking failures means…",
+     o:["ignoring errors","hiding/converting failures via techniques like checksums and replication","always retrying","closing sockets"],
+     a:1,
+     e:"Example: checksum converts arbitrary to omission by detecting corruption."},
+
+    {t:"Reliable 1‑to‑1 communication validity means…",
+     o:["messages never delayed","any message in sender’s outgoing buffer is eventually delivered to receiver’s incoming buffer","receiver always faster","infinite bandwidth"],
+     a:1,
+     e:"Validity + integrity define reliability in slides."},
+
+    {t:"Integrity in reliable communication means…",
+     o:["receiver may alter message","message received is identical to sent and not delivered twice","encryption applied","no jitter"],
+     a:1,
+     e:"No corruption and no duplicates."},
+
+    // Security model & threats
+    {t:"Security model protects…",
+     o:["only packets","processes, channels, and encapsulated objects/resources from unauthorized access","CSS files","battery life"],
+     a:1,
+     e:"Objects guarded via principals and access rights."},
+
+    {t:"A principal is…",
+     o:["router only","a user or process whose identity is verified by the server","a file descriptor","a certificate authority only"],
+     a:1,
+     e:"Servers authenticate principals and check access rights on invocation."},
+
+    {t:"Denial of Service (DoS) in slides refers to…",
+     o:["legal takedown","excessive pointless invocations or transmissions causing resource overload","user logout","TCP slow start"],
+     a:1,
+     e:"Overwhelms processing capacity or bandwidth."},
+
+    {t:"Mobile code threat is described as…",
+     o:["safe by default","Trojan‑horse risk when executing code from elsewhere on host","only compile‑time issue","impossible on browsers"],
+     a:1,
+     e:"Downloaded code may modify host resources against interest."},
+
+    {t:"Security goals for channels include…",
+     o:["validity, integrity, privacy","only throughput","only latency","battery usage"],
+     a:0,
+     e:"Threats relate to confidentiality (privacy), integrity, and validity."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

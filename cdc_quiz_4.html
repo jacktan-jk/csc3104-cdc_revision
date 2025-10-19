@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDC – Lecture 03 MCQ Test (Inter‑Process Communication)</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>CDC – Lecture 03 MCQ Test (IPC)</h1>
+        <div class="sub">Blocking vs Non‑blocking • Ports & Sockets • UDP • TCP • Marshalling & XDR • Java Serialization • Request‑Reply • Reliability & Integrity • Multicast • Failure Models • 30 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Source: Lecture_03 – IPC‑1. For study practice only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // Basics
+    {t:"IPC in these notes is defined primarily as…",
+     o:["shared memory on one host only","message passing between pairs of processes using send/receive","only file I/O","DMA across PCIe"],
+     a:1,
+     e:"Slides define IPC around send/receive primitives and message queues."},
+
+    {t:"In synchronous communication…",
+     o:["send and receive are non‑blocking","send/receive are blocking; sender blocks until a matching receive and receiver blocks until a message arrives","only receive blocks","neither blocks"],
+     a:1,
+     e:"Both operations can block; variants appear later for async."},
+
+    {t:"Asynchronous communication per slides means…",
+     o:["send is non‑blocking; receive may be blocking or non‑blocking","send blocks; receive never blocks","both block","neither ever blocks"],
+     a:0,
+     e:"Async send returns immediately; receive may be polled or interrupt‑driven."},
+
+    {t:"A port (in the slides’ sense) is…",
+     o:["a GUI widget","a message destination within a computer, identified by an integer, with exactly one receiver and many senders","a MAC address","a fiber channel ID"],
+     a:1,
+     e:"One receiver, many senders; a process may listen on many ports."},
+
+    {t:"A socket binds…",
+     o:["only a hostname","a local Internet address and a port; IPC transmits messages between sockets","two MAC addresses only","files to pipes"],
+     a:1,
+     e:"Socket abstraction couples IP address+port for endpoints."},
+
+    {t:"How many port numbers are available per host (as stated)?",
+     o:["2^8","2^10","2^16","2^32"],
+     a:2,
+     e:"Slides: \"2^16 port numbers available in each computer\" for receiving processes."},
+
+    // UDP
+    {t:"UDP is characterized by…",
+     o:["acknowledged streams","unreliable datagrams without built‑in acks/retries","per‑byte delivery guarantees","mandatory TLS"],
+     a:1,
+     e:"No built‑in reliability; simplicity benefits (DNS/VoIP)."},
+
+    {t:"In UDP, if a message is too big for the specified buffer…",
+     o:["it raises an exception only","it is truncated on arrival","it is automatically split by the API into multiple app messages","it blocks until a larger buffer is provided"],
+     a:1,
+     e:"Receive uses a byte array; oversize datagrams are truncated."},
+
+    {t:"Typical socket behavior noted:",
+     o:["non‑blocking receives only","non‑blocking sends and blocking receives by default","both operations blocking by default","both non‑blocking by default"],
+     a:1,
+     e:"The slides mention non‑blocking send with blocking receive as common."},
+
+    {t:"A sound practice with UDP receives is to…",
+     o:["block forever to ensure delivery","set timeouts to avoid indefinite blocking in case of loss/crash","retry without timeout","disable exceptions"],
+     a:1,
+     e:"Timeouts guard against lost messages and crashed peers."},
+
+    {t:"UDP failure model includes…",
+     o:["only timing failures","omission (drops), possible reordering; integrity via checksum","no omissions ever","exact once delivery"],
+     a:1,
+     e:"Checksum detects corruption; omissions and reordering can occur."},
+
+    {t:"A Java class used for UDP datagrams in the examples is…",
+     o:["ServerSocket","DatagramSocket / DatagramPacket","SocketChannel","HttpClient"],
+     a:1,
+     e:"Examples show DatagramSocket and DatagramPacket for send/receive."},
+
+    // TCP
+    {t:"TCP provides the abstraction of…",
+     o:["unordered datagrams","a reliable byte stream with flow control and retransmissions","only fixed‑size records","multicast delivery"],
+     a:1,
+     e:"Stream hides packets; acks, timeouts, seq numbers handle loss/dup/reorder."},
+
+    {t:"Which is TRUE about TCP validity/integrity here?",
+     o:["Integrity uses checksums/sequence numbers; validity via timeouts+retransmissions","Validity is guaranteed under all failures","Integrity requires application checksums only","Neither is addressed"],
+     a:0,
+     e:"Slides explicitly tie integrity to checksum/seqno and validity to timeout/retry."},
+
+    {t:"Under severe congestion with no ACKs for a long time, TCP…",
+     o:["keeps retrying forever","declares the connection broken; delivery no longer guaranteed","switches to UDP","multicasts packets"],
+     a:1,
+     e:"TCP cannot guarantee delivery under all failures; it may give up."},
+
+    {t:"Java API classes for TCP shown are…",
+     o:["ServerSocket and Socket","DatagramSocket and Pipe","SocketPair and Stream","Selector and Channel"],
+     a:0,
+     e:"Server listens with ServerSocket; client/server communicate via Socket I/O streams."},
+
+    // Marshalling & XDR
+    {t:"External Data Representation (XDR‑like) is…",
+     o:["a GUI theme","an agreed standard for representing data structures and primitive values for transmission","a compression algorithm only","TLS record format"],
+     a:1,
+     e:"Parties agree on how to encode data for the wire."},
+
+    {t:"Marshalling is…",
+     o:["serial execution","flattening/assembling data into a transmissible byte sequence; unmarshalling reverses it","only JSON parsing","a TCP congestion phase"],
+     a:1,
+     e:"Convert in‑memory objects to bytes and back on the other side."},
+
+    {t:"A noted endian issue is…",
+     o:["big‑endian always used","architectures differ (big vs little); parties must agree or tag formats","endianness irrelevant for integers","Unicode enforces little‑endian only"],
+     a:1,
+     e:"Slides list big‑endian and little‑endian; must standardize or tag."},
+
+    {t:"Compared with XML, binary formats like CORBA CDR/Java…",
+     o:["are always larger","are typically more compact; XML is textual and can carry type info","cannot carry objects","lack portability"],
+     a:1,
+     e:"Slides contrast compactness and information carried."},
+
+    // Java serialization specifics
+    {t:"For Java RMI, objects can be sent if…",
+     o:["they implement Serializable","they are final classes only","they implement Closeable","they are primitive wrappers only"],
+     a:0,
+     e:"Implementing Serializable enables Java’s object serialization."},
+
+    {t:"Serialized form carries…",
+     o:["no type info","class name/version and field names/types, with handles to avoid duplication","only raw bytes without schema","only field values with no names"],
+     a:1,
+     e:"Notes show class metadata and handles h0/h1 to avoid repeat writing."},
+
+    // Request‑reply
+    {t:"In request–reply, the client primitive named in slides is…",
+     o:["doOperation","receiveReply","enqueue","exec"],
+     a:0,
+     e:"Protocol trio: doOperation (client), getRequest (server), sendReply (server)."},
+
+    {t:"Why do many request–reply protocols run over UDP per slides?",
+     o:["to avoid TLS","to avoid connection setup/flow‑control overhead; requests are small and replies serve as ACKs","because UDP is always faster regardless","to support multicast only"],
+     a:1,
+     e:"Connection and flow control are often redundant for short invocations."},
+
+    {t:"Duplicate request handling on the server involves…",
+     o:["rebooting","filtering repeated request IDs for the same client","ignoring IDs","asking the client to stop"],
+     a:1,
+     e:"Short client timeouts can cause resends; servers deduplicate by ID."},
+
+    {t:"An idempotent operation is one that…",
+     o:["fails if repeated","yields the same effect if executed multiple times","requires locks","needs multicast"],
+     a:1,
+     e:"Idempotence simplifies retry handling when replies are lost."},
+
+    {t:"One way to cope with lost replies is for the server to…",
+     o:["disable timeouts","store and resend the last reply per client (history)","force clients to reconnect","drop duplicates silently"],
+     a:1,
+     e:"History caches allow resending without re‑execution."},
+
+    // Group communication & multicast
+    {t:"Group communication (multicast) is used for…",
+     o:["single‑host debugging","replication for fault tolerance, update dissemination to replicas, and event notifications","only DNS","UI rendering"],
+     a:1,
+     e:"Slides cite replicated services and notifications as key uses."},
+
+    {t:"IP multicast uses addresses in…",
+     o:["Class A","Class B","Class C","Class D (1110xxxx)"],
+     a:3,
+     e:"Class D addresses identify multicast groups; membership is dynamic."},
+
+    {t:"Multicast program behavior noted:",
+     o:["sender must be a group member","sender can send to group without joining","routers always deliver to every member despite failures","group is static"],
+     a:1,
+     e:"Membership is dynamic; sending without joining is allowed."},
+
+    {t:"Multicast failure semantics match…",
+     o:["TCP streams","UDP datagrams (omission; no delivery/order guarantees)","exactly‑once RPC","filesystem semantics"],
+     a:1,
+     e:"Unreliable multicast inherits UDP omissions and unordered delivery."},
+
+    {t:"Ordering with multicast across processes…",
+     o:["is globally FIFO by default","can differ per receiver; messages from different senders may arrive in different orders at different members","is total order always","is impossible"],
+     a:1,
+     e:"Slides: ordering is not consistent without extra protocols."},
+
+    // Summary
+    {t:"Slide summary contrasts UDP vs TCP as…",
+     o:["UDP simple with omission failures; TCP reliable with extra messages/latency/storage","both identical","UDP always slower","TCP unordered"],
+     a:0,
+     e:"Final slide states UDP’s simplicity vs TCP’s reliability costs."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class=\"opts\"></div>
+        <div class=\"explain hidden\"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class=\"badge\">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

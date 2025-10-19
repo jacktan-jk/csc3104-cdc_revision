@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDC – Lectures 00–01 MCQ Test</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>CDC – Lectures 00–01 MCQ Test</h1>
+        <div class="sub">Intro to Distributed Systems • Implications • Challenges • Openness & Security • Failure handling • Transparency • History • 28 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Source: SIT‑UofG CDC – Lectures 00–01. For study practice only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (28) =====
+  const BANK = [
+    {t:"According to the lecture, a distributed system’s components coordinate their actions by?",
+     o:["Sharing a single global memory across machines","Passing messages over a communications network","Invoking local system calls only","Using a universal hardware clock"],
+     a:1,
+     e:"Key point from definitions: components coordinate only by message passing."},
+
+    {t:"Which implication is not listed as a main implication of distributed systems?",
+     o:["Concurrency","No global clock","Independent failures","Guaranteed fault-free execution"],
+     a:3,
+     e:"Distributed systems assume partial failures can happen; fault-free execution is not guaranteed."},
+
+    {t:"Which is a standard approach to handle heterogeneity?",
+     o:["Rewrite applications for each OS","Rely on identical hardware across the fleet","Program against abstractions (e.g., Java bytecode, Internet protocols)","Disable network encryption"],
+     a:2,
+     e:"Abstractions and middleware mask differences among platforms."},
+
+    {t:"Openness of a distributed system primarily depends on:",
+     o:["Published specifications and documented interfaces","Number of users","Clock speed of servers","Use of proprietary protocols only"],
+     a:0,
+     e:"Open systems require published interfaces (e.g., IETF RFCs)."},
+
+    {t:"Which trio defines security goals discussed in the lecture?",
+     o:["Auditability, portability, scalability","Confidentiality, Integrity, Availability","Latency, throughput, jitter","Hashing, sharding, caching"],
+     a:1,
+     e:"CIA triad is the core set of security objectives."},
+
+    {t:"Which challenges were marked as not fully solved?",
+     o:["Encryption for data-in-transit","User authentication","Access control within a single process","Defending against (D)DoS and securing mobile code"],
+     a:3,
+     e:"Lecture notes flag (D)DoS and mobile code security as unsolved."},
+
+    {t:"Scalability aims to:",
+     o:["Eliminate all network delays","Ensure centralized control for consistency","Control resource costs and performance degradation as load grows","Guarantee O(1) time for all operations"],
+     a:2,
+     e:"The lecture stresses cost control and graceful performance under growth."},
+
+    {t:"Middleware is described as:",
+     o:["A software layer that provides abstractions and masks heterogeneity","A hardware load balancer","A database index type","A container image registry"],
+     a:0,
+     e:"Examples include CORBA, Java RMI, Google RPC."},
+
+    {t:"Which is an example of a distributed system per the lecture?",
+     o:["Single-threaded desktop app","The Internet / WWW","A local spreadsheet file","A standalone calculator"],
+     a:1,
+     e:"The Internet and WWW are canonical distributed systems."},
+
+    {t:"In the ATM example, what core difficulty is illustrated?",
+     o:["Static type safety","UI consistency","Coordinating state across components under failures and message loss","Energy consumption"],
+     a:2,
+     e:"Ordering, loss, and crashes create agreement/consistency issues."},
+
+    {t:"Which statement about failures is consistent with the lecture?",
+     o:["Failures are always global; either everything works or nothing does","Failure detection is trivial if you retry enough","Timeouts should never be used in browsers","Failures are often partial; masking, tolerating, and recovery are key"],
+     a:3,
+     e:"Notes discuss partial failures, masking, tolerance, and recovery."},
+
+    {t:"Transparency in DS aims to:",
+     o:["Conceal distribution so the system appears as a whole","Expose all internal locations for debugging","Enforce manual message routing by users","Disable replication"],
+     a:0,
+     e:"E.g., access, mobility, replication, scaling transparency."},
+
+    {t:"Which pair is correctly matched as middleware examples?",
+     o:["TCP & UDP","DHCP & DNS","CORBA & Java RMI","CIDR & NAT"],
+     a:2,
+     e:"Both are classic middleware technologies mentioned."},
+
+    {t:"Which is an example of a scalability control mentioned?",
+     o:["Guaranteeing zero latency","Keeping complexity to O(n) or O(log n) where possible","Centralizing all state in a single server","Disabling caching to avoid staleness"],
+     a:1,
+     e:"The notes reference controlling performance degradation using complexity guidance."},
+
+    {t:"Which statement about time is emphasized?",
+     o:["Distributed systems lack a single global notion of time","NTP provides a perfect global clock","All nodes must share a hardware clock","Timestamps are unnecessary for coordination"],
+     a:0,
+     e:"Absence of a global clock complicates coordination."},
+
+    {t:"Which combination of activities appears in the course assessment?",
+     o:["Only a final exam (100%)","Only project (100%)","Only AWS Academy online course (100%)","Mid-trimester test, AWS/Dell online courses, project, and final exam"],
+     a:3,
+     e:"Assessment is 100% CA split across multiple components."},
+
+    {t:"Which week includes “Time and Global States” in the provisional schedule?",
+     o:["Week 5","Week 8","Week 11","Week 13"],
+     a:1,
+     e:"Per schedule, Week 8 lists Time and Global States."},
+
+    {t:"Which example was explicitly used to illustrate agreement problems?",
+     o:["Byzantine Generals","Dining Philosophers","Readers–Writers","TCP three-way handshake"],
+     a:0,
+     e:"Slides discuss the Byzantine generals problem."},
+
+    {t:"Which of the following is not a listed distributed systems challenge?",
+     o:["Transparency","Heterogeneity","Guaranteed real-time video encoding","Security"],
+     a:2,
+     e:"Real-time video encoding is unrelated to core DS challenges listed."},
+
+    {t:"Which statement about the historical context is correct?",
+     o:["Distributed computing predates ancient empires","Ancient empires illustrate distributed coordination under delays","The Internet was launched in 1960 with TCP/IP","ENIAC was a low‑power pocket device"],
+     a:1,
+     e:"Slides use historical analogies (Persian/Roman) to show coordination challenges."},
+
+    {t:"Which is cited as a motivation for building distributed systems?",
+     o:["Resource sharing","Eliminating concurrency","Guaranteeing perfect uptime","Avoiding networks"],
+     a:0,
+     e:"Resource sharing is given as the main motivation."},
+
+    {t:"Which is not listed as assumed knowledge?",
+     o:["Java/C/Python programming","Concurrency (threads, locks)","Network programming with sockets","Quantum computing with qubits"],
+     a:3,
+     e:"Quantum computing is not part of the assumed knowledge list."},
+
+    {t:"Which components are part of the course outline under “Middleware”?",
+     o:["Only HTTP REST","Blockchain mining","IPC and gRPC","GPU programming"],
+     a:2,
+     e:"IPC and gRPC are explicitly mentioned."},
+
+    {t:"Which trio is an example of failure handling techniques?",
+     o:["Detection, masking, recovery","Polling, paging, prefetch","Compression, encryption, hashing","Sharding, partitioning, compaction"],
+     a:0,
+     e:"These appear explicitly in the failure handling slide."},
+
+    {t:"Which transparency type is mentioned in the lecture?",
+     o:["Debugging transparency","Compiler transparency","Battery transparency","Access, mobility, replication, scaling"],
+     a:3,
+     e:"These are the examples given."},
+
+    {t:"Which platform/resources are recommended in the lecture for Cloud topics?",
+     o:["Photoshop tutorials","CNCF, Kubernetes docs, VMware Docker/K8s materials, AWS Academy","Only a single vendor’s whitepaper","Old Usenet forums"],
+     a:1,
+     e:"CNCF, kubernetes.io, VMware materials, and AWS Academy are listed."},
+
+    {t:"Which statement about the Internet’s scalability concern was mentioned?",
+     o:["Exhaustion of IPv4 address space (e.g., 2^32 addresses)","Browsers must be single-threaded","All routers must be identical","Every host must run the same OS"],
+     a:0,
+     e:"Address space exhaustion was highlighted as a scalability example."},
+
+    {t:"Which of the following best describes the role of checkpoints?",
+     o:["They remove the need for redundancy","They guarantee no data loss","They capture a consistent state to enable recovery/rollback","They enforce global time synchronization"],
+     a:2,
+     e:"Checkpointing facilitates recovery to a consistent state."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

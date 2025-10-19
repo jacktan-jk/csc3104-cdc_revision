@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDC – Lecture 05 MCQ Test (Time & Global States)</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>CDC – Lecture 05 MCQ Test (Time & Global States)</h1>
+        <div class="sub">Physical clocks • Skew & drift • External vs internal sync • Cristian & bounds • Berkeley • NTP (offset/delay) • Happened‑before • Lamport clocks • Vector clocks • 30 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Source: Lecture_05 – Time and Global States. For study practice only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // Motivation & model
+    {t:"Why is time problematic in distributed systems per the lecture?",
+     o:["A single perfect global clock exists","Each computer has its own clock with drift and we cannot synchronise perfectly","Networks enforce identical timestamps","Time is irrelevant theoretically"],
+     a:1,
+     e:"Slides: each computer has its own physical clock; drift causes imperfect sync; only approximate."},
+
+    {t:"Skew vs drift are respectively…",
+     o:["frequency vs. phase","instantaneous difference between two clock readings; long‑term rate difference (oscillation frequency)","packet delay vs. loss","hardware vs. software time"],
+     a:1,
+     e:"Skew: difference in readings now. Drift: clocks run at different rates over time."},
+
+    {t:"Typical drift rate cited for ordinary clocks is about…",
+     o:["10^-3 s/s","10^-6 s/s","10^-9 s/s","exactly zero"],
+     a:1,
+     e:"About 1 microsecond per second (≈1 s per ~11.6 days)."},
+
+    {t:"Software clock Ci(t) is formed as…",
+     o:["Ci(t)=Hi(t)","Ci(t)=α·Hi(t)+β (scale and offset from hardware counter)","Ci(t)=e^t","Ci(t)=t^2"],
+     a:1,
+     e:"OS scales hardware count and adds offset to produce software clock."},
+
+    {t:"External synchronisation aims to keep |S(t) − Ci(t)| < D where S is…",
+     o:["system uptime","authoritative UTC source (e.g., GPS)","process ID","CPU TSC"],
+     a:1,
+     e:"Definition on slide: accuracy to an external UTC source within bound D."},
+
+    {t:"Internal synchronisation aims to keep…",
+     o:["|Ci(t) − Cj(t)| < D for all i,j","Ci(t)=S(t)","NTP stratum fixed","zero drift"],
+     a:0,
+     e:"Clocks agree with each other within bound D; no external reference required."},
+
+    // Cristian’s algorithm & bounds
+    {t:"Cristian’s method sets local clock to…",
+     o:["t","t + Tround/2","t − Tround/2","server time at receipt"],
+     a:1,
+     e:"Assumes symmetric path; p sets to server time plus half round‑trip."},
+
+    {t:"With known tmin, Cristian’s accuracy bound is…",
+     o:["±(Tround)","±(½Tround − tmin)","±(tmin)","no bound"],
+     a:1,
+     e:"Earliest and latest server‑timestamp placements yield ±(½Tround − tmin)."},
+
+    {t:"To cope with variability, Cristian suggests…",
+     o:["single sample only","taking multiple samples and using the minimum Tround","averaging all RTTs always","discarding tmin"],
+     a:1,
+     e:"Minimum RTT approximates the path closest to tmin for best accuracy."},
+
+    // Berkeley algorithm
+    {t:"Berkeley algorithm provides…",
+     o:["external sync to UTC only","internal sync via a master polling slaves, averaging times, sending adjustments","per‑host NTP strata","GPS discipline at each node"],
+     a:1,
+     e:"Master estimates offsets (RTTs), averages (discard outliers), sends deltas; leader re‑elected on failure."},
+
+    {t:"In Berkeley, the master improves fault tolerance by…",
+     o:["never polling","throwing away outlier clocks before averaging","locking all clocks","using stratum‑1 GPS"],
+     a:1,
+     e:"Outliers are discarded to avoid skewing the average."},
+
+    // NTP
+    {t:"NTP design aims include…",
+     o:["single server only","redundant servers/paths; frequent resync to offset drift; UTC accuracy","per‑host manual updates","no hierarchy"],
+     a:1,
+     e:"Slides: redundancy and hierarchical strata; clients resync sufficiently often."},
+
+    {t:"In NTP, three timestamps carried in each message pair (between peers) capture…",
+     o:["only send time","transmit time of previous msg, receipt time of previous response, transmit time of this msg","router queue depth","GPS PPS"],
+     a:1,
+     e:"Used to compute offset and delay across the pair of messages."},
+
+    {t:"For a message pair i, NTP defines di (delay) and oi (offset) such that…",
+     o:["o = di","oi ± ½di bounds the true offset o","o = 0 always","di is negative"],
+     a:1,
+     e:"From analysis: oi − ½di ≤ o ≤ oi + ½di; di indicates estimate accuracy."},
+
+    {t:"Which NTP mode is most accurate per the slides?",
+     o:["Multicast","Procedure‑call","Symmetric (peer) mode","Email"],
+     a:2,
+     e:"Symmetric exchange between peers on LAN or higher levels; retains timing data to improve accuracy."},
+
+    // Logical time & HB
+    {t:"Happened‑before relation (→) is generated by…",
+     o:["wall‑clock ordering only","per‑process program order and message send→receive, closed under transitivity","physical distance","IP addresses"],
+     a:1,
+     e:"HB1: local order; HB2: send before receive; HB3: transitivity."},
+
+    {t:"If events a and b are in different processes and no chain of messages connects them, then…",
+     o:["a → b","b → a","a ∥ b (concurrent)","they cannot exist"],
+     a:2,
+     e:"Slides: not all events are related by happened‑before; such pairs are concurrent."},
+
+    {t:"Lamport clocks guarantee that if e → e′ then…",
+     o:["L(e) > L(e′)","L(e) < L(e′)","L(e) = L(e′)","no relation"],
+     a:1,
+     e:"Property: happened‑before implies increasing Lamport timestamps."},
+
+    {t:"But from L(e) < L(e′) we can conclude…",
+     o:["e → e′","e and e′ are concurrent","nothing about causality beyond a consistent total order","vector order"],
+     a:2,
+     e:"Lamport timestamps impose a total order consistent with HB, not causality implication."},
+
+    {t:"Lamport clock rules include…",
+     o:["LC1 increment after events only","LC1: increment before each local event; LC2: piggyback timestamp on sends; on receive: Lj=max(Lj,t), then increment before timestamping receive","never increment","use UTC only"],
+     a:1,
+     e:"Slide lists LC1/LC2 precisely for send/receive processing."},
+
+    // Vector clocks
+    {t:"Vector clocks remedy Lamport’s shortcoming by…",
+     o:["reducing space to O(1)","allowing comparison of vectors to determine if events are causally related or concurrent","using GPS time","encrypting timestamps"],
+     a:1,
+     e:"V≤V′ means potential causality; incomparable vectors imply concurrency."},
+
+    {t:"Vector clock update rules include…",
+     o:["VC1: all ones initially","VC2: increment own component before timestamping; VC3: include full vector on send; VC4: on receive, take componentwise max then increment own","increment after receive only","sort components"],
+     a:1,
+     e:"Rules VC1–VC4 from the slides; componentwise max merges knowledge."},
+
+    {t:"Comparing vector timestamps V and V′: V < V′ iff…",
+     o:["sum(V) < sum(V′)","V ≤ V′ and V ≠ V′ (componentwise)","lexicographic order only","wall‑clock order"],
+     a:1,
+     e:"Componentwise ≤ and at least one strict inequality."},
+
+    {t:"A disadvantage of vector clocks called out is…",
+     o:["they require GPS","overhead proportional to number of processes N (storage/message size)","lack of partial order","inability to detect concurrency"],
+     a:1,
+     e:"Space and bandwidth grow with N."},
+
+    // Global state intuition
+    {t:"The lecture motivates logical clocks because…",
+     o:["we can always order events by physical time","synchronisation accuracy is insufficient to determine ordering of arbitrary event pairs","we don’t send messages","processes share memory"],
+     a:1,
+     e:"Hence need HB relation and logical clocks to reason about executions."},
+
+    // Examples & properties
+    {t:"In the three‑process example with messages m1 and m2, a → f because…",
+     o:["physical time increases","there exists a chain a→b (local), b→c (send/receive m1), c→d (local), d→f (send/receive m2)","they are concurrent","vector timestamps are equal"],
+     a:1,
+     e:"HB relation via transitivity along local orders and message edges."},
+
+    {t:"Monotonicity condition for software clocks can be maintained even if…",
+     o:["hardware clock runs backwards","hardware clock runs fast; software controls scale/offset to enforce monotonicity","drift is zero","no interrupts"],
+     a:1,
+     e:"Adjust α and β without decreasing time readings."},
+
+    {t:"Clock resolution caveat states…",
+     o:["timestamps always differ for successive events","successive events only get different timestamps if clock resolution is finer than their separation","resolution doesn’t matter","OS randomises timestamps"],
+     a:1,
+     e:"If updates are too coarse, multiple events can share same timestamp."},
+
+    {t:"In NTP hierarchy, accuracy generally…",
+     o:["improves at lower strata","degrades as you move down from stratum‑1","is identical at all levels","doesn’t depend on stratum"],
+     a:1,
+     e:"Each level introduces additional error; stratum‑1 closest to UTC."},
+
+    {t:"Which NTP use‑mode is intended for high‑speed LANs but provides relatively low accuracy?",
+     o:["Symmetric","Multicast","Procedure‑call","Out‑of‑band"],
+     a:1,
+     e:"Multicast mode periodically multicasts time; assumes small delay; lower accuracy."},
+
+    {t:"When computing oi and di in NTP analysis, di is…",
+     o:["offset estimate","total transmission delay for the two messages in the exchange","clock drift","queueing jitter only"],
+     a:1,
+     e:"di = t + t′ = (Ti-2 − Ti-3) + (Ti − Ti-1)."},
+
+    {t:"Logical clocks are used to…",
+     o:["measure real time exactly","order events without precise physical time, enabling reasoning about global states","replace physical clocks entirely","allocate memory"],
+     a:1,
+     e:"Primary purpose stated in opening slide: ordering and reasoning about executions."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

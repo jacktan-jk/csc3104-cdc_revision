@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDC – Lecture 02b MCQ Test (Cloud Computing)</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>CDC – Lecture 02b MCQ Test</h1>
+        <div class="sub">Cloud basics • Utility model • Virtualization & Hypervisors • IaaS/PaaS/SaaS/FaaS • Deployment (Private/Public/Hybrid) • Multi‑cloud • Big Data on Cloud • Vendor lock‑in • 30 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Source: Lecture_02b‑cloud.pdf. For study practice only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // Cloud concept & definition
+    {t:"The lecture’s utility view of cloud means…",
+     o:["fixed monthly fees regardless of use","commercial availability of discrete computing services delivered remotely, paid on demand","free academic resources only","outsourcing that requires multi‑year upfront commitments"],
+     a:1,
+     e:"Cloud exposes services (compute, storage, etc.) as on‑demand utilities – pay for what you use."},
+
+    {t:"Which four features were highlighted as ‘new’ in today’s cloud?",
+     o:["Massive scale, on‑demand access, data‑intensive nature, new programming paradigms","Decentralized DNS, IPv6, TLS 1.3, QUIC","Only mobile apps, edge AI, AR, VR","Guaranteed real‑time video"],
+     a:0,
+     e:"Slides list massive scale; pay‑as‑you‑go; TB‑PB‑EB data; MapReduce/NoSQL etc."},
+
+    {t:"John McCarthy’s 1961 quote predicted…",
+     o:["serverless databases","computing organized as a public utility like telephony","5G radios","quantum supremacy"],
+     a:1,
+     e:"‘Computing may someday be organized as a public utility…’"},
+
+    {t:"Perils of corporate computing the cloud addresses include…",
+     o:["low variable cost","heavy fixed costs, overcapacity, low CPU utilization, unreliable hardware","zero energy cost","no security requirements"],
+     a:1,
+     e:"Cloud shifts capex to opex and improves utilization vs. underused on‑prem installs."},
+
+    // Characteristics
+    {t:"Which phrase best summarizes NIST‑style cloud characteristics here?",
+     o:["Ubiquitous, on‑demand network access; rapid provisioning; minimal management",
+        "Manual ticketing; long lead times; fixed hardware",
+        "Air‑gapped only; no remote access",
+        "Local‑only workloads by design"],
+     a:0,
+     e:"Cues from the slide: ubiquitous, convenient, on‑demand, rapid provision/release."},
+
+    // Virtualization & hypervisors
+    {t:"Virtualization in the lecture is described as…",
+     o:["emulation that always runs slower","provider allocating virtual hardware (CPU, disk, memory, net) to customers; behaves like physical","only containers","GPU‑only sharing"],
+     a:1,
+     e:"Perspective: virtual hardware behaves like physical from user viewpoint."},
+
+    {t:"A hypervisor is…",
+     o:["a browser plugin","software that allocates/isolates virtualized resources on provider hardware","a database index","a VPN protocol"],
+     a:1,
+     e:"Runs on data‑center hardware to carve resources into instances."},
+
+    {t:"Type‑1 vs Type‑2 hypervisors:",
+     o:["Type‑1 runs on bare metal; Type‑2 runs atop a host OS","Type‑1 is slower; Type‑2 is faster","Type‑1 for laptops only; Type‑2 for servers","They are identical"],
+     a:0,
+     e:"Slide: Type‑1 on hardware (also provides OS services); Type‑2 under a host OS."},
+
+    // Service models
+    {t:"Match service model to example correctly:",
+     o:["IaaS → Gmail; PaaS → EC2; SaaS → S3","IaaS → EC2/S3; PaaS → App Engine/Elastic Beanstalk; SaaS → Salesforce/Office365","IaaS → QuickBooks; PaaS → Redshift; SaaS → Hypervisor","All are SaaS"],
+     a:1,
+     e:"IaaS rents compute/storage; PaaS offers managed app platforms; SaaS is subscription software."},
+
+    {t:"FaaS per the slides is characterized by…",
+     o:["always‑on servers","microservice‑style runtime that runs code on demand and bills only for execution time","local thick clients","long‑lived VMs with stateful disks"],
+     a:1,
+     e:"Environment spins up on request and stops when idle; you pay only while executing."},
+
+    {t:"A key caveat of FaaS in these notes:",
+     o:["stores relational data by default","processes data without storing; environment stops when idle (no cost)","requires GPU always","replaces all PaaS"],
+     a:1,
+     e:"Slide: FaaS processes data and the environment halts when idle."},
+
+    // Managed services & scalability
+    {t:"‘Managed services’ in this lecture refers to…",
+     o:["local IT helpdesk","provider‑operated infrastructure/services that firms can add/reduce as needed","on‑prem batch scheduling only","manual server imaging"],
+     a:1,
+     e:"Cloud lets firms add/reduce services – managed infrastructure."},
+
+    {t:"Scalability with cloud enables firms to…",
+     o:["fix capacity for 5 years","add or reduce computing services on demand","avoid monitoring","disable redundancy"],
+     a:1,
+     e:"Elastic scale is central to the value proposition."},
+
+    // Deployment models
+    {t:"Private cloud per the slides is…",
+     o:["owned/controlled by the firm; services delivered on the firm’s network","public service over Internet only","multi‑tenant SaaS","free tier accounts"],
+     a:0,
+     e:"Private may be physical or virtual; delivered on corporate network."},
+
+    {t:"VPC (Virtual Private Cloud) in this context:",
+     o:["consumer VPN app","public‑cloud provider dedicates resources logically isolated for a customer, often via VPN","an email protocol","a storage file system"],
+     a:1,
+     e:"Provider controls DC; customer gets isolated virtual network via VPN."},
+
+    {t:"Public cloud is defined as…",
+     o:["firm uses 3rd‑party provider over the public Internet; pay for what is used","only government networks","private MPLS only","must be free"],
+     a:0,
+     e:"Pay‑per‑use services delivered over Internet by provider."},
+
+    {t:"Hybrid cloud means…",
+     o:["two laptops on Wi‑Fi","mix of on‑prem/private cloud with public cloud services","only multi‑region within one provider","edge only"],
+     a:1,
+     e:"Slides: private for key data; public for infra; supports cloud bursting."},
+
+    {t:"A benefit of hybrid cloud listed:",
+     o:["no need for networking","supports dynamic workloads via cloud bursting and splits critical vs. non‑critical","eliminates security concerns","guarantees zero downtime"],
+     a:1,
+     e:"Use private for critical resources, burst to public for peaks/dev."},
+
+    // Multi‑cloud
+    {t:"Multi‑cloud differs from hybrid because…",
+     o:["it’s only private/public split","it can span multiple different public providers/services, not just private vs. public","it requires colocation","it forbids microservices"],
+     a:1,
+     e:"Reduces reliance on one vendor; distribute across providers."},
+
+    {t:"Benefits of multi‑cloud mentioned:",
+     o:["vendor lock‑in, single point of failure","avoid vendor lock‑in, avoid single‑provider failures, match best‑of‑breed services, address data sovereignty","simpler billing only","no need for monitoring"],
+     a:1,
+     e:"Also supports legal residency requirements for data."},
+
+    // Vendor lock‑in
+    {t:"Vendor lock‑in risk examples include…",
+     o:["easy format interchange everywhere","data transfer time/format issues and app rework when moving providers","no downtime ever","identical APIs across all clouds"],
+     a:1,
+     e:"Slides: data format portability and migration downtime; app configuration tied to provider."},
+
+    {t:"To avoid lock‑in, slides recommend…",
+     o:["tight coupling to provider APIs","design loosely coupled microservices and maximize data portability/standards; consider multi‑cloud","hardcode regions","binary data without schema"],
+     a:1,
+     e:"Loose coupling and portable data formats mitigate lock‑in risk."},
+
+    // Big Data on cloud
+    {t:"Why is cloud suited for big data per the lecture?",
+     o:["because disks are cheap only","provides elastic clusters for storage/compute; data sizes TB‑PB‑EB; fast turn‑around with managed stacks","requires on‑prem only","no network needed"],
+     a:1,
+     e:"Elastic clusters process large datasets; managed EMR‑like stacks accelerate work."},
+
+    {t:"AWS big‑data services mentioned include…",
+     o:["Lambda, CloudFront, Route 53, IAM","EMR, Kinesis, Redshift, Machine Learning (ML)","ECS, EKS, Fargate, Lightsail","Access, Mobility, Replication, Scaling"],
+     a:1,
+     e:"Slide explicitly lists EMR, Kinesis, Redshift, ML."},
+
+    {t:"Data revolution point raised:",
+     o:["petabyte collections are easy to move","data sets may be too large to transmit economically; move compute to data","optical disks only","CPU is the only bottleneck"],
+     a:1,
+     e:"Petabyte‑scale often implies compute near data; share infra overhead via clouds."},
+
+    // Clarifications about devices vs cloud
+    {t:"Slides note that cloud/remote services are…",
+     o:["substitutes for your device hardware","not substitutes; your device still has its own hardware/OS; cloud services are remote","replacements for all local apps","mandatory for offline"],
+     a:1,
+     e:"Each device has native HW/OS; cloud augments via remote services."},
+
+    // SaaS specifics
+    {t:"SaaS billing/ops according to slides:",
+     o:["perpetual license, on‑prem installs","subscription per user; no need to install/host/maintain locally","hardware purchase required","usage requires root"],
+     a:1,
+     e:"Delivered over Internet; provider runs/updates the software."},
+
+    {t:"SaaS examples listed:",
+     o:["Gmail, Office365, Salesforce, PayCom, QuickBooks","Hadoop, Kafka, Spark","EC2, S3","Heroku, App Engine"],
+     a:0,
+     e:"These appear explicitly on the slides."},
+
+    // PaaS specifics
+    {t:"PaaS value prop per slides:",
+     o:["gives raw VMs only","delivers pre‑packaged dev frameworks/tools (e.g., DevOps) to simplify building and running apps","manages only storage arrays","forbids CI/CD"],
+     a:1,
+     e:"Examples given: Elastic Beanstalk, Heroku, App Engine, Apache Stratos."},
+
+    // IaaS specifics
+    {t:"IaaS common use case highlighted:",
+     o:["desktop publishing","development and test environments that emulate production via templates/virtualization","VR rendering only","edge caching"],
+     a:1,
+     e:"Template/copy many consistent environments; quality improves."},
+
+    {t:"IaaS can be used for…",
+     o:["native/web/mobile app hosting; storage/backup; data recovery","only DNS","fonts","spreadsheets"],
+     a:0,
+     e:"Provides runtime servers, disk space, memory, backups & recovery."},
+
+    // Security & disadvantages
+    {t:"A disadvantage/risk called out for cloud:",
+     o:["no dependency on providers","dependency on third‑party provider; security and data control/egress concerns","no updates ever","no SLA needed"],
+     a:1,
+     e:"Data under provider’s control; moving data away may be limited/expensive."},
+
+    // Summary perspective
+    {t:"Final summary point in slides:",
+     o:["cloud is entirely new and unrelated to past systems","cloud builds on earlier timesharing/data‑processing; identify which aspects are truly ‘new’ (scale/on‑demand/data/programming)","cloud replaces distributed systems theory","solutions never existed before"],
+     a:1,
+     e:"Encourages mapping problems to existing solutions unless truly novel cloud aspects apply."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

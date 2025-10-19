@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDC – Lecture 04 MCQ Test (RPC)</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>CDC – Lecture 04 MCQ Test (RPC)</h1>
+        <div class="sub">RPC model • Goals & transparency • Protocol vs stubs • Sync vs Async • Failures & invocation semantics • Idempotence & history • gRPC & Protobuf • 30 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Source: Lecture_04 – RPC-1.pdf. For study practice only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // RPC basics
+    {t:"RPC primarily supports which interaction pattern?",
+     o:["Publish/subscribe","Request/Reply between client and server","Peer gossip","Batch file transfer"],
+     a:1,
+     e:"Slides define RPC as a protocol supporting the request/reply paradigm; client blocks awaiting reply."},
+
+    {t:"Goal of RPC from the lecture:",
+     o:["Expose all network details","Make remote calls look like local procedure calls","Avoid using functions","Replace all protocols"],
+     a:1,
+     e:"Hide complexity and make distribution transparent to programmers."},
+
+    {t:"Two major components of an RPC mechanism are:",
+     o:["DHCP and DNS","A protocol plus language/stub compiler support","Only sockets","TLS and HTTP/3"],
+     a:1,
+     e:"Protocol handles messaging; stubs marshal args/returns at each end."},
+
+    {t:"What do stubs do?",
+     o:["Encrypt disks","Package arguments into request messages and unmarshal replies","Schedule threads","Assign IPs"],
+     a:1,
+     e:"Client stub marshals call; server stub unmarshals and invokes local proc."},
+
+    {t:"Why is simple connection establishment considered overkill for some RPCs per slides?",
+     o:["RPC never uses networks","Because many RPCs exchange a single request and reply","Because TCP is unreliable","Because UDP requires a handshake"],
+     a:1,
+     e:"For a pair of messages, a full connection setup may be unnecessary."},
+
+    // Transparency caveats
+    {t:"RPC tries to make remote look local, but it’s not always simple because…",
+     o:["address spaces and data representations differ and machines/network can fail","everything shares one memory","there are no failures","all OSes are identical"],
+     a:0,
+     e:"Different address spaces/environments and partial failures break perfect transparency."},
+
+    // Synchronous vs Asynchronous
+    {t:"Synchronous RPC means…",
+     o:["call returns immediately","client blocks waiting for reply while server executes","server never runs","client continues without waiting"],
+     a:1,
+     e:"Traditional RPC: client suspended until reply arrives."},
+
+    {t:"Asynchronous RPC means…",
+     o:["client blocks always","call returns immediately while server continues processing","server sends no reply ever","must use multicast"],
+     a:1,
+     e:"Client regains control; server completes later; can combine two async RPCs."},
+
+    // Failures
+    {t:"Which is NOT a failure listed?",
+     o:["Request lost","Reply lost","Server crash after receiving request","Perfect global clock skew"],
+     a:3,
+     e:"Slides list request/reply loss and client/server crashes; clock skew is separate timing issue."},
+
+    {t:"A key challenge highlighted:",
+     o:["Can always distinguish slow execution from failure","Cannot, in principle, distinguish slow execution from failure","No partial failures exist","Networks never lose messages"],
+     a:1,
+     e:"Fundamental uncertainty in distributed systems."},
+
+    // Invocation semantics
+    {t:"Exactly-once semantics in general are…",
+     o:["trivial","impossible in practice","guaranteed by UDP","guaranteed by retries"],
+     a:1,
+     e:"Slide: ‘Exactly-once – impossible in practice’."},
+
+    {t:"At-least-once semantics are safe for…",
+     o:["non-idempotent ops","idempotent operations","all operations","read-modify-write of counters"],
+     a:1,
+     e:"Repeats won’t change effect; safe with dedup or idempotent ops."},
+
+    {t:"At-most-once semantics can result in…",
+     o:["zero or one execution","two guaranteed executions","infinite executions","compile-time error"],
+     a:0,
+     e:"‘Zero, don’t know or once’ from the slide."},
+
+    {t:"Duplicate filtering at server helps achieve…",
+     o:["exactly-once","at-most-once","at-least-once","maybe"],
+     a:1,
+     e:"Filter repeated request IDs so re-execution doesn’t happen."},
+
+    {t:"Maintaining a per-client history allows server to…",
+     o:["avoid replies","retransmit last reply without re-executing","force client reconnect","skip authentication"],
+     a:1,
+     e:"History cache supports resending replies when client missed them."},
+
+    {t:"In the invocation table, retransmit request + duplicate filtering + retransmit reply gives…",
+     o:["maybe semantics","at-least-once","at-most-once","exactly-once"],
+     a:2,
+     e:"Combination yields at-most-once per slide’s table."},
+
+    // Idempotence
+    {t:"An idempotent procedure…",
+     o:["changes state more with each retry","can be repeated without changing the result beyond the first application","must be read-only","cannot use network"],
+     a:1,
+     e:"E.g., set x=5 or fetch; safe under retries."},
+
+    {t:"Non-idempotent example from the notes is…",
+     o:["set balance to 100","increment balance by 1","read current balance","stateless query"],
+     a:1,
+     e:"Repeating increments multiplies effect; requires care."},
+
+    // Reliability patterns
+    {t:"If a request is lost, a typical client behavior is to…",
+     o:["wait forever","timeout and retransmit the request","crash","switch to multicast"],
+     a:1,
+     e:"Timeouts with retries are standard; leads to duplicate requests risk."},
+
+    {t:"If the server crashes after executing but before replying, client may…",
+     o:["still receive reply","timeout and resend, causing potential duplicate execution","automatically detect exact outcome","guarantee exactly-once"],
+     a:1,
+     e:"Hence duplicate filtering/history to avoid re-execution."},
+
+    // Protocol/transport remarks
+    {t:"RPC is described as…",
+     o:["just bi-directional UDP","more than a bi-directional UDP exchange; it overcomes network limitations for request/reply","always simpler than TCP and never uses it","equivalent to TCP"],
+     a:1,
+     e:"Slide contrasts ‘much more than bi-directional UDP’; handles retries, timeouts, etc."},
+
+    // gRPC specifics
+    {t:"gRPC uses which approach to define services?",
+     o:["Ad-hoc JSON","IDL with Protocol Buffers","XML-RPC only","Manual sockets"],
+     a:1,
+     e:"Services are defined in .proto files and compiled with protoc."},
+
+    {t:"Languages actively supported by gRPC include…",
+     o:["COBOL only","C++, Java, Python, Go, Ruby, Node.js, C#, PHP","HTML/CSS only","Bash only"],
+     a:1,
+     e:"Explicitly listed on the slide."},
+
+    {t:"After defining a .proto, developers…",
+     o:["hand-write parsers","use protoc to generate data access classes and stubs","configure DHCP","compile to assembly"],
+     a:1,
+     e:"protoc emits code with getters/setters and (de)serialization."},
+
+    {t:"Which is NOT one of the four gRPC method types?",
+     o:["Unary","Server streaming","Client streaming","Batch map-reduce"],
+     a:3,
+     e:"Method types are unary, server-streaming, client-streaming, bidirectional-streaming."},
+
+    {t:"In server-streaming RPC, gRPC guarantees…",
+     o:["global total order across calls","message ordering within the individual RPC call","no ordering at all","exactly-once for each message"],
+     a:1,
+     e:"Ordering guarantee is scoped to the single RPC call."},
+
+    {t:"Client-streaming RPC means…",
+     o:["client sends one message","client writes a sequence of messages then awaits a single response","server sends no response","messages must be same size"],
+     a:1,
+     e:"Client streams, server responds once after reading them."},
+
+    {t:"Bidirectional streaming RPC allows…",
+     o:["only client to send","both sides to send streams independently in any order","server only to send","strict alternation"],
+     a:1,
+     e:"Two independent read-write streams per the slide."},
+
+    {t:"Protocol Buffers messages consist of…",
+     o:["untyped bytes","name–value fields defined in messages; compiled to classes for access/serialization","HTML tags","SQL tables only"],
+     a:1,
+     e:"Define schema, compile to code with serialization methods."},
+
+    // Wrap-up
+    {t:"The lecture cites classic RPC systems as…",
+     o:["SMTP and POP3","SunRPC, DCE RPC, and Google RPC (gRPC)","FTP and TFTP","only HTTP"],
+     a:1,
+     e:"Given in the summary slide."},
+
+    {t:"Overall, RPC aims to…",
+     o:["expose distribution","abstract the presence of network and heterogeneity while acknowledging partial failures","remove failures entirely","replace all async models"],
+     a:1,
+     e:"Final summary emphasizes abstraction + protocol support; failures still exist."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDC – Docker & K8s Checkpoint MCQ Test</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>CDC – Docker & Kubernetes Checkpoint MCQ Test</h1>
+        <div class="sub">Docker fundamentals • Images/Containers • Dockerfile & Registry • Compose • Logging/Env • K8s: Pods/Deployments/Services • Reconcile loop • Scaling • Config/Secrets • Volumes • Namespaces/Quotas • 30 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Source: “(SIT‑UofG CDC) – Learning Docker & k8s – Checkpoint‑1”. For study practice only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // 1. Concepts
+    {t:"A container (per the deck) is best described as…",
+     o:["a full VM with its own kernel","a standardized unit bundling app, runtime, libraries, and config to run reliably across environments","a source tarball","a hardware partition"],
+     a:1,
+     e:"Slide recap: container packages code + runtime + deps + config as a portable unit."},
+
+    {t:"Which diagram trio is emphasized as distinct in Docker fundamentals?",
+     o:["YAML, JSON, XML","Dockerfile → Image → Container","Server → Client → Switch","Git → Branch → Tag"],
+     a:1,
+     e:"The deck repeatedly shows Dockerfile builds an Image which runs as a Container."},
+
+    {t:"Select the correct relationship:",
+     o:["`docker run` creates a new image","`docker build` creates an image from a Dockerfile; `docker run` instantiates a container from an image","`docker tag` starts a container","`docker save` pushes to a registry"],
+     a:1,
+     e:"Build → image; Run → container. Tag just adds a name; save exports to a tar."},
+
+    // 2. Docker architecture & CLI
+    {t:"The Docker architecture shown consists of…",
+     o:["only containers","Client/CLI talking to the Docker daemon via REST API on a Docker Host (engine/runtime)","hypervisor and guests","only a registry"],
+     a:1,
+     e:"Diagram: CLI → REST API → daemon/engine on the host managing containers."},
+
+    {t:"Which path correctly matches registry operations in the figure list?",
+     o:["run → restart → compile","push/pull, load/save, export to tar","ssh/adduser","commit/clone"],
+     a:1,
+     e:"The ‘Docker Fundamentals’ slide enumerates push/pull, load/save, export.tar etc."},
+
+    {t:"`docker commit` (as listed) does…",
+     o:["creates a container","creates a new image from a container's changes","pushes to registry","sets env vars at runtime"],
+     a:1,
+     e:"Commit captures the current container filesystem as an image layer (not best practice for reproducibility)."},
+
+    {t:"Exposing containers (per the learning path) refers to…",
+     o:["printing logs","publishing container ports to the host/network","encrypting images","binding GPUs only"],
+     a:1,
+     e:"Module ‘Exposing Docker Containers’ implies port publishing (e.g., -p host:container)."},
+
+    {t:"Container logging and environment configuration modules focus on…",
+     o:["editing the kernel","stdout/stderr log capture and injecting settings with env vars/config files","building kernels","editing BIOS"],
+     a:1,
+     e:"Two modules: logging + environment configuration in containers."},
+
+    // 3. Dockerfile basics
+    {t:"Essential building blocks mentioned for Dockerfile include…",
+     o:["FROM, RUN, COPY/ADD, EXPOSE, ENV, CMD/ENTRYPOINT","class, interface, namespace","PRIMARY KEY, FOREIGN KEY","H1, H2, H3"],
+     a:0,
+     e:"Slide: ‘Essential Building Blocks in Dockerfile’."},
+
+    {t:"Best practice implied by the deck for images is…",
+     o:["feature‑branch containers","build reproducible images from Dockerfiles rather than committing running containers","always use :latest without pinning","bake secrets into images"],
+     a:1,
+     e:"The course flow emphasizes Dockerfiles and registries for repeatability and ops."},
+
+    {t:"Managing images with registries covers…",
+     o:["only local caching","pushing/pulling tagged images to/from remote registries","building kernels","SSH multiplexing"],
+     a:1,
+     e:"Module ‘Managing Docker Images with Registries’."},
+
+    // 4. Compose & multi-container
+    {t:"Running multi‑containers with Docker‑Compose enables…",
+     o:["one container max","defining multi‑service apps in YAML and controlling them with a single command set","GPU passthrough only","VM orchestration"],
+     a:1,
+     e:"Module ‘Running Multi‑Containers with Docker‑Compose’."},
+
+    // 5. K8s fundamentals
+    {t:"Kubernetes is introduced as…",
+     o:["a kernel module","a container orchestration platform for running distributed apps at scale","a SQL database","a hypervisor"],
+     a:1,
+     e:"‘What is Kubernetes?’ slide states container orchestration platform; CNCF flagship."},
+
+    {t:"Which statement matches the K8s ‘fun facts’ slide?",
+     o:["‘k8s’ means 8 clusters","‘kubernetes’ shortens to ‘k8s’; from Greek κυβερνήτης (helmsman)","‘k8s’ is a binary format","‘kubernetes’ is an acronym"],
+     a:1,
+     e:"The deck spells out the nickname and Greek origin."},
+
+    {t:"Kubernetes abstracts underlying…",
+     o:["only CPU","compute, storage, and network infrastructure behind a common API","DNS only","nothing; apps talk to hardware directly"],
+     a:1,
+     e:"Diagram ‘Abstracting away the Infrastructure’."},
+
+    {t:"A Pod is defined as…",
+     o:["a VM","the smallest deployable unit; groups one or more containers and has a unique IP in the cluster","a registry namespace","a K8s node"],
+     a:1,
+     e:"Pod slide: smallest deployable unit with its own IP; groups containers."},
+
+    {t:"If a Pod dies under a Deployment with replicas=1, Kubernetes…",
+     o:["does nothing","self‑heals by creating a replacement Pod to reconcile desired=actual state","requires manual kubectl run","reboots the node"],
+     a:1,
+     e:"Sequence of ‘Pod down’ → controller recreates → desired state maintained."},
+
+    {t:"The control loop that drives ‘desired state = actual state’ is called…",
+     o:["optimizer","reconcile loop (kube‑controller‑manager)","RPC loop","TLS handshake"],
+     a:1,
+     e:"‘Reconcile Loop’ slide names controller pattern and examples (Deployment/Job)."},
+
+    {t:"Horizontal scaling example in the deck shows…",
+     o:["reducing replicas to save cost","increasing Deployment replicas from 1 to 3 for high traffic","switching to stateful sets","moving to a monolith"],
+     a:1,
+     e:"Sequence diagrams illustrate scaling replicas to 3."},
+
+    {t:"A Service in Kubernetes provides…",
+     o:["container logs","stable networking endpoint and load‑balancing for Pods","RBAC only","CLI aliases"],
+     a:1,
+     e:"Service/Networking appears in ‘Exploring Kubernetes’ topics; Services expose Pods."},
+
+    {t:"ConfigMaps and Secrets are used to…",
+     o:["embed config and credentials inside images","externalize configuration and sensitive data away from images","replace Deployments","format YAML"],
+     a:1,
+     e:"Topic list: ‘Externalizing Configuration with ConfigMaps and Secrets’."},
+
+    {t:"Volumes in Kubernetes are presented as…",
+     o:["UI widgets","mechanisms to persist data for Pods when needed","GPU drivers","TLS certs only"],
+     a:1,
+     e:"Topic list: ‘Persisting Data with Volumes’."},
+
+    {t:"Namespaces and Resource Quotas address…",
+     o:["log rotation","multi‑tenancy/isolation and capping resource usage per team/project","DNS caching","GPU scheduling only"],
+     a:1,
+     e:"Topic list item: ‘Managing Namespaces and Resource Quotas’."},
+
+    // 6. Troubles & sprawl
+    {t:"‘Container sprawl’ in the slides refers to…",
+     o:["few containers to manage","proliferation of containers/services creating new operational challenges","lack of images","single‑tenant clusters only"],
+     a:1,
+     e:"Slide ‘We have a new set of challenges’ narrates sprawl problems before orchestration."},
+
+    {t:"Container orchestration capabilities enumerated include…",
+     o:["only logging","service discovery/LB, storage orchestration, automated rollouts/rollbacks, autoscaling, self‑healing, secret/config mgmt","desktop UI themes","PCI passthrough"],
+     a:1,
+     e:"Bulleted list under ‘Container Orchestration’."},
+
+    {t:"Which is NOT a stated orchestration capability?",
+     o:["self‑healing","auto‑scaling","manual hex‑editing of images","secret/config management"],
+     a:2,
+     e:"Manual hex‑editing is unrelated; others are on the bullet list."},
+
+    // 7. Misc reinforcement
+    {t:"The checkpoint’s learning path starts with…",
+     o:["K8s operators","Introduction to Containers and Docker, then Docker architecture and image fundamentals","RBAC policies first","Storage classes only"],
+     a:1,
+     e:"First modules 1–3 match the learning path slide."},
+
+    {t:"‘Getting Up to Speed with Docker’ includes modules on…",
+     o:["GPU tuning","creating custom images with Dockerfile, managing registries, compose, best practices","Windows registry hacks","hypervisor snapshots"],
+     a:1,
+     e:"Modules 7–12 cover Dockerfile/registries/Compose/best practices."},
+
+    {t:"Kubernetes originated…",
+     o:["as a CNCF fork of BSD","at Google, open‑sourced in 2014; now CNCF flagship","at Apache in 1999","as a Linux kernel patch"],
+     a:1,
+     e:"Explicitly stated on the ‘What is Kubernetes?’ slide."},
+
+    {t:"A Pod’s IP is…",
+     o:["shared cluster‑wide per namespace","unique within the cluster and changes when the Pod is replaced","the node IP","a DNS CNAME"],
+     a:1,
+     e:"Pod slide: unique IP; replacement creates a new Pod/IP, hence Services for stability."},
+
+    {t:"Deployments help with…",
+     o:["bare‑metal provisioning","self‑healing and rollout strategies over ReplicaSets/Pods","GPU drivers","kernel upgrades"],
+     a:1,
+     e:"The sequence shows self‑healing and scaling controlled by a Deployment."},
+
+    {t:"The deck links to further study via…",
+     o:["four Google Slides links under ‘Exploring Kubernetes’","a single PDF only","an MP3","TikTok"],
+     a:0,
+     e:"Multiple Google Slides URLs are embedded on the final ‘Exploring Kubernetes’ slide."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

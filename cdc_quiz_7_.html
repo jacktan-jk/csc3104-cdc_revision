@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDC – Docker & Kubernetes Intro MCQ Test</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>CDC – Docker & Kubernetes Intro MCQ Test</h1>
+        <div class="sub">Cloud‑native basics • Containers & Docker • Monoliths→Microservices • VM vs Containers • Benefits • Kubernetes overview • Course pointers • 30 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Source: “(SIT‑UofG CDC) – Learning Docker & k8s – Intro”. For study practice only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // Cloud vs Cloud‑native
+    {t:"‘A Cloud is an abstraction’ in the slides means…",
+     o:["users directly manage hardware","cloud hides infra details behind on‑demand services",
+        "only private data centers qualify","VMs are unnecessary"],
+     a:1,
+     e:"The deck frames cloud as abstracted resources exposed via services."},
+
+    {t:"Cloud‑native vs Cloud computing: which statement matches the slides?",
+     o:["They are identical concepts","Cloud‑native is an approach to building/running apps that exploits the cloud delivery model",
+        "Cloud‑native forbids microservices","Cloud computing requires monoliths"],
+     a:1,
+     e:"Cloud‑native leverages cloud characteristics for app design and ops."},
+
+    {t:"Traits of cloud‑native called out include…",
+     o:["Tight coupling and manual ops","Scalability, loose coupling, resilience, manageability, observability",
+        "Only on‑prem hosting","No automation"],
+     a:1,
+     e:"These five traits are enumerated explicitly on the slides."},
+
+    {t:"Elements of cloud‑native in the deck are…",
+     o:["monoliths and shared memory","containers, service meshes, microservices, immutable infrastructure, declarative APIs",
+        "bare‑metal only","adhoc scripts"],
+     a:1,
+     e:"These elements are listed verbatim in the ‘Elements of Cloud Native’."},
+
+    {t:"Design considerations for distributed apps list that an app should…",
+     o:["tie to a host and go down on failures","not tie to a specific host; tolerate failures; stay accessible under load; enable zero‑downtime updates",
+        "require manual restarts","avoid redundancy"],
+     a:1,
+     e:"Bullet list states host‑agnostic, resilient, scalable, and no‑downtime releases."},
+
+    // Monoliths → microservices
+    {t:"A monolithic app per the slides is…",
+     o:["one unit of deployment with tightly coupled functions","a set of independent services","only a database","a serverless function"],
+     a:0,
+     e:"Monolith runs as a single service; tightly coupled components."},
+
+    {t:"Limitations of a monolith mentioned include…",
+     o:["easy to scale individual parts","lock‑in to a stack, low fault tolerance, scaling limitations, harder feature addition over time",
+        "perfect isolation","no coupling"],
+     a:1,
+     e:"These limits are listed on the ‘Limitations of a Monolithic App’ slide."},
+
+    {t:"‘Tightly coupled architecture’ slide illustrates…",
+     o:["loosely connected services","strongly connected components (web/app/DB) with tight dependencies",
+        "stateless microservices","only client‑side code"],
+     a:1,
+     e:"Diagram shows components strongly connected to each other."},
+
+    {t:"Microservice architecture slide shows…",
+     o:["all modules share one DB","decomposed services with their own databases (per‑service data)",
+        "no network required","single deployment"],
+     a:1,
+     e:"Graphic depicts multiple services each with a DB."},
+
+    {t:"Modernizing a monolith creates which new problem noted by the slides?",
+     o:["none","where and how to host many services",
+        "testing becomes trivial","DBs become unnecessary"],
+     a:1,
+     e:"Slide follows with ‘Where do we host them?’ leading to containers."},
+
+    // Containers & Docker
+    {t:"A container (in this deck) is…",
+     o:["a hypervisor","a standardized unit bundling code + dependencies + runtime, abstracting the app from the environment",
+        "a VM image only","a database record"],
+     a:1,
+     e:"Definition bullets: packages code, runtime, libs, config; portable unit."},
+
+    {t:"Key points under ‘What is Docker?’ include…",
+     o:["closed‑source, launched 2003","open‑source (2013), industry standard for containers, portable and cloud‑agnostic, lightweight",
+        "Windows‑only","GPU‑only"],
+     a:1,
+     e:"Slide lists open source (2013), portability, cloud‑agnostic, lightweight."},
+
+    {t:"Benefits of containers listed include…",
+     o:["inconsistent builds and high resource use","consistency, predictability, portability, isolation, resource efficiency, separation of responsibilities, improved dev productivity",
+        "no isolation","manual packaging"],
+     a:1,
+     e:"All seven benefits are captured on a dedicated slide."},
+
+    {t:"Comparing with a VM, the deck emphasizes that…",
+     o:["containers are the same as VMs","containers share the host OS with a container runtime, not a full guest OS per app",
+        "VMs are lighter","containers require hypervisors only"],
+     a:1,
+     e:"Diagram contrasts guest OS per VM vs shared host OS with runtime."},
+
+    {t:"The slides also note containers…",
+     o:["cannot run on VMs","work perfectly with VMs too",
+        "break portability","require bare metal only"],
+     a:1,
+     e:"There is a slide explicitly titled ‘Works perfectly with VMs too!’."},
+
+    {t:"Our first Docker command shown is…",
+     o:["docker run hello","docker version",
+        "docker build","kubectl get nodes"],
+     a:1,
+     e:"The slide shows sample output for `docker version`."},
+
+    // Hosting & platforms
+    {t:"Where do we host many microservices according to the flow of the deck?",
+     o:["keep adding VMs only","use containers and an orchestrator",
+        "FTP to a server","run as desktop apps"],
+     a:1,
+     e:"Containerization and orchestration are the proposed answer."},
+
+    {t:"Docker Desktop is presented as…",
+     o:["a learning course","a product to run/build containers locally on Windows/macOS/Linux",
+        "a hypervisor only","a network switch"],
+     a:1,
+     e:"The deck links to Docker Desktop product page."},
+
+    {t:"Play‑with‑Docker is…",
+     o:["a game","a browser‑based lab environment to experiment with Docker",
+        "a Kubernetes vendor","a monitoring tool"],
+     a:1,
+     e:"Slide links to labs.play-with-docker.com for hands‑on practice."},
+
+    // Kubernetes
+    {t:"Kubernetes section in the deck covers topics such as…",
+     o:["CAD design","intro, architecture, deployment, imperative/declarative workflows, services/networking, deployments, config/secrets, volumes, namespaces/quotas, best practices/troubleshooting",
+        "DSP algorithms","Windows registry"],
+     a:1,
+     e:"The ‘Exploring Kubernetes’ slide lists these ten topics."},
+
+    {t:"Kubernetes is introduced primarily as…",
+     o:["a programming language","an orchestration system for deploying and managing containerized applications",
+        "a VM hypervisor","a database"],
+     a:1,
+     e:"The section heading implies orchestration for containers."},
+
+    {t:"Imperative vs declarative in the deck refers to…",
+     o:["hand‑drawn diagrams vs UML","issuing step‑by‑step commands vs defining desired state for the system to converge to",
+        "binary vs text","client vs server"],
+     a:1,
+     e:"These terms appear as a topic item in the Kubernetes list."},
+
+    {t:"Services & Networking (K8s topic) indicates…",
+     o:["storage only","exposing/publishing pods to stable endpoints and routing traffic",
+        "GPU tuning","cron jobs only"],
+     a:1,
+     e:"Named in the topics list; services give stable access to pods."},
+
+    {t:"ConfigMaps and Secrets topic hints at…",
+     o:["embedding creds in images","externalizing configuration and sensitive data from images",
+        "no separation of concerns","hardcoding env"],
+     a:1,
+     e:"Topic title: Externalizing configuration with ConfigMaps and Secrets."},
+
+    {t:"Volumes topic implies…",
+     o:["stateless only","persisting data for containers/pods when needed",
+        "removing all storage","tapes"],
+     a:1,
+     e:"‘Persisting Data with Volumes’ is listed explicitly."},
+
+    {t:"Namespaces & Resource Quotas topic addresses…",
+     o:["UI themes","multi‑tenancy/isolation and limiting resource usage per team/project",
+        "only logs","only DNS"],
+     a:1,
+     e:"Named in the list; implies scoping and quota limits."},
+
+    // Courses & access
+    {t:"The deck points to a ‘Getting Up to Speed with Docker’ course and notes…",
+     o:["no account needed","registration via Dell learning portal with email/OTP",
+        "GitHub only","mobile app only"],
+     a:1,
+     e:"Steps include sign‑up, OTP verification, and enrollment."},
+
+    {t:"Learners are told to allow…",
+     o:["ad blockers","pop‑ups for course video window",
+        "cookies disabled","root access"],
+     a:1,
+     e:"Note: the course launches in a new pop‑up window."},
+
+    {t:"Two support contacts listed on access slide are…",
+     o:["root@localhost and admin@example.com","c.chua@dell.com and Brenda.Koh@dell.com",
+        "support@kubernetes.io and help@docker.com","dns@dell.com and tcp@dell.com"],
+     a:1,
+     e:"Email addresses appear on the portal‑access slide."},
+
+    // Misc correctness checks
+    {t:"Which is NOT an element of cloud‑native per the deck?",
+     o:["service meshes","immutable infrastructure","declarative APIs","tightly coupled monoliths"],
+     a:3,
+     e:"Tightly coupled monoliths are presented as a contrast, not an element."},
+
+    {t:"Which statement matches the ‘Why go Cloud‑Native?’ slide?",
+     o:["fewer releases and more toil","robust automation enables frequent, predictable, low‑toil changes",
+        "manual handoffs are preferred","avoid observability"],
+     a:1,
+     e:"Blurb highlights high‑impact changes with minimal toil via automation."},
+
+    {t:"Standardized packaging in containers improves…",
+     o:["snowflake servers","environment drift","build consistency and portability across environments",
+        "manual installs"],
+     a:2,
+     e:"Benefits list calls out consistency, predictability, portability."},
+
+    {t:"The deck’s VM vs Container diagrams primarily teach that…",
+     o:["every app needs its own guest OS in both models","VMs virtualize hardware; containers virtualize OS/user‑space",
+        "containers include hypervisors","VMs share host OS"],
+     a:1,
+     e:"Side‑by‑side diagrams distinguish hypervisor+guest OS vs OS+runtime."},
+
+    {t:"In the Docker ‘version’ output shown, which sections appear?",
+     o:["only client","Client and Server sections with component versions (engine, containerd, runc, docker‑init)",
+        "only server","only runc"],
+     a:1,
+     e:"The sample output lists client/server and component versions."},
+
+    {t:"A quick practice environment linked is…",
+     o:["KataCoda only","Play‑with‑Docker online lab",
+        "VMware vCenter","Minikube only"],
+     a:1,
+     e:"The slide provides labs.play-with-docker.com."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
